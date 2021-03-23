@@ -47,10 +47,11 @@ router.post('/create', (req, res) => {
             // (in other words, create a new row in the
             // products table)
             const newProduct = new Product();
-            newProduct.set('name', form.data.name);
-            newProduct.set('cost', form.data.cost);
-            newProduct.set('description', form.data.description);
-            newProduct.set('category_id', form.data.category_id);
+            newProduct.set(form.data);
+            // newProduct.set('name', form.data.name);
+            // newProduct.set('cost', form.data.cost);
+            // newProduct.set('description', form.data.description);
+            // newProduct.set('category_id', form.data.category_id);
             await newProduct.save();
             res.redirect('/products')
         },
@@ -63,6 +64,12 @@ router.post('/create', (req, res) => {
 })
 
 router.get('/:product_id/update', async (req, res) => {
+    // get all the possible categories
+     const allCategories = await Category.fetchAll().map((category)=>{
+        return [ category.get('id'), category.get('name')]
+    });
+
+
     // 1. get the product that we want to update
     // i.e, select * from products where id = ${product_id}
     const productToEdit = await Product.where({
@@ -73,10 +80,14 @@ router.get('/:product_id/update', async (req, res) => {
 
 
     // 2. send the product to the view
-    const form = createProductForm();
+
+
+    const form = createProductForm(allCategories);
     form.fields.name.value = productToEdit.get('name');
     form.fields.cost.value = productToEdit.get('cost');
     form.fields.description.value = productToEdit.get('description');
+    // assign the current category_id to the form
+    form.fields.category_id.value = productToEdit.get('category_id');
 
     res.render('products/update', {
         'form': form.toHTML(bootstrapField),
