@@ -25,13 +25,15 @@ app.use(
 
 // import in the routes
 const landingRoutes = require('./routes/landing');
-const corporateRoutes = require('./routes/corporate')
+const corporateRoutes = require('./routes/corporate');
+const productRoutes = require('./routes/products')
 
 async function main() {
   // if the URL begins exactly with a forward slash
   // use the landingRoutes
   app.use('/', landingRoutes);
   app.use('/for-investors', corporateRoutes);
+  app.use('/products', productRoutes);
 }
 
 main();
