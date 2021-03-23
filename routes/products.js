@@ -101,4 +101,30 @@ router.post("/:product_id/update", async (req, res) => {
     })
 })
 
+router.get('/:product_id/delete', async (req,res)=>{
+    // 1. get the product that we want to delete
+    // i.e, select * from products where id = ${product_id}
+    const productToDelete = await Product.where({
+        'id': req.params.product_id
+    }).fetch({
+        required: true
+    });
+
+    res.render('products/delete.hbs', {
+        'product': productToDelete.toJSON()
+    })
+})
+
+router.post('/:product_id/delete', async(req,res)=>{
+    const productToDelete = await Product.where({
+        'id': req.params.product_id
+    }).fetch({
+        required: true
+    });
+
+    // delete the product
+    await productToDelete.destroy();
+    res.redirect('/products');
+})
+
 module.exports = router;
