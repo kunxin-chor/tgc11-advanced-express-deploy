@@ -63,7 +63,8 @@ router.post('/create', (req, res) => {
             if (tags) {
                 await newProduct.tags().attach(tags.split(","))
             }
-
+            // display a success message
+            req.flash('success_messages', 'New product has been created successfully');
             res.redirect('/products')
         },
         'error': (form) => {
