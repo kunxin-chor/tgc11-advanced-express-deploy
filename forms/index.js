@@ -40,7 +40,7 @@ const createProductForm = (categories, tags) => {
             cssClass: {
                 label: ['form-label']
             },
-            validators:[validators.integer()]
+            validators: [validators.integer()]
         }),
         'description': fields.string({
             required: true,
@@ -50,18 +50,18 @@ const createProductForm = (categories, tags) => {
             }
         }),
         'category_id': fields.string({
-            label:'Category',
+            label: 'Category',
             required: true,
             errorAfterField: true,
             cssClasses: ['form-label'],
             widget: widgets.select(),
-            choices: categories           
+            choices: categories
         }),
-        'tags': fields.string({            
-            required:true,
+        'tags': fields.string({
+            required: true,
             errorAfterField: true,
             cssClasses: {
-                label:['form-label']
+                label: ['form-label']
             },
             widget: widgets.multipleSelect(),
             choices: tags
@@ -69,4 +69,39 @@ const createProductForm = (categories, tags) => {
     });
 }
 
-module.exports = { createProductForm, bootstrapField}
+const createUserForm = () => {
+    return forms.create({
+        'username': fields.string({
+            required: true,
+            errorAfterField: true,
+            cssClasses: {
+                label: ['form-label']
+            }
+        }),
+        'email': fields.string({
+            required: true,
+            errorAfterField: true,
+            cssClasses: {
+                label: ['form-label']
+            },
+            validators: [validators.email()]
+        }),
+        'password': fields.password({
+            required: true,
+            errorAfterField: true,
+            cssClasses: {
+                label: ['form-label']
+            }
+        }),
+        'confirm_password': fields.password({
+            required: true,
+            errorAfterField: true,
+            cssClasses: {
+                label: ['form-label']
+            },
+            validators:[validators.matchField('password')]
+        })
+    })
+}
+
+module.exports = { createProductForm, createUserForm, bootstrapField }

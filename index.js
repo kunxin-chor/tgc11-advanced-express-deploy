@@ -47,6 +47,7 @@ app.use(function(req,res,next){
 const landingRoutes = require('./routes/landing');
 const corporateRoutes = require('./routes/corporate');
 const productRoutes = require('./routes/products')
+const userRoutes = require('./routes/users')
 
 async function main() {
   // if the URL begins exactly with a forward slash
@@ -54,6 +55,7 @@ async function main() {
   app.use('/', landingRoutes);
   app.use('/for-investors', corporateRoutes);
   app.use('/products', productRoutes);
+  app.use('/users', userRoutes);
 }
 
 main();
