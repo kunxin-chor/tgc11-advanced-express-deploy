@@ -35,11 +35,19 @@ app.use(session({
 // setup Flash
 app.use(flash());
 
-// a middleware
+// a middleware (Flash middleware)
 app.use(function(req,res,next){
     // inject into the hbs file the success messages and error messages
     res.locals.success_messages = req.flash('success_messages');
     res.locals.error_messages = req.flash('error_messages');
+    next();
+})
+
+// global middleware to inject the req.session.user
+// object into the local variables (i.e, variables
+// accessible by hbs files)
+app.use(function(req,res,next){
+    res.locals.user = req.session.user;
     next();
 })
 

@@ -11,6 +11,9 @@ const { Product, Category, Tag } = require('../models');
 // import in the forms
 const { createProductForm, bootstrapField } = require('../forms')
 
+// import in the checkIfAuthenticated middleware
+const {checkIfAuthenticated} = require('../middlewares')
+
 router.get('/', async (req, res) => {
 
     // How we get the data previously using mysql2:
@@ -28,7 +31,7 @@ router.get('/', async (req, res) => {
     })
 })
 
-router.get('/create', async (req, res) => {
+router.get('/create', checkIfAuthenticated, async (req, res) => {
     const allCategories = await Category.fetchAll().map((category) => {
         return [category.get('id'), category.get('name')]
     });
@@ -41,7 +44,7 @@ router.get('/create', async (req, res) => {
     })
 });
 
-router.post('/create', async (req, res) => {
+router.post('/create', checkIfAuthenticated, async (req, res) => {
 
      const allCategories = await Category.fetchAll().map((category) => {
         return [category.get('id'), category.get('name')]
@@ -89,7 +92,7 @@ router.post('/create', async (req, res) => {
     })
 })
 
-router.get('/:product_id/update', async (req, res) => {
+router.get('/:product_id/update', checkIfAuthenticated, async (req, res) => {
     // get all the possible categories
     const allCategories = await Category.fetchAll().map((category) => {
         return [category.get('id'), category.get('name')]
@@ -123,11 +126,11 @@ router.get('/:product_id/update', async (req, res) => {
 
     res.render('products/update', {
         'form': form.toHTML(bootstrapField),
-        'product': productJSON
+        'product': productJSON,
     })
 })
 
-router.post("/:product_id/update", async (req, res) => {
+router.post("/:product_id/update", checkIfAuthenticated, async (req, res) => {
     // 1. get the product that we want to update
     // i.e, select * from products where id = ${product_id}
     const productToEdit = await Product.where({
