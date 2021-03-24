@@ -18,8 +18,9 @@ router.get('/', async (req, res) => {
     //const [products] = connection.execute(query)
 
     let products = await Product.collection().fetch({
-        withRelated: ['category']
+        withRelated: ['category', 'tags']
     });
+
 
 
     res.render('products/index', {

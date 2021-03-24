@@ -21,6 +21,7 @@
             <th>
                 Description
             </th>
+            <th>Tags</th>
             <th></th>
         </tr>
     </thead>
@@ -31,6 +32,11 @@
             <td>{{this.category.name}}</td>
             <td>{{this.cost}}</td>
             <td>{{this.description}}</td>
+            <td>
+                {{#each this.tags}}
+                <span class="badge badge-pill badge-primary">{{this.name}}</span>
+                {{/each}}
+            </td>
             <td>
                 <a href="/products/{{this.id}}/update" class="btn btn-primary btn-sm">Update</a>
                 <a href="/products/{{this.id}}/delete" class="btn btn-danger btn-sm">Delete</a>
