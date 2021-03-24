@@ -40,8 +40,18 @@ router.get('/create', async (req, res) => {
     })
 });
 
-router.post('/create', (req, res) => {
-    const productForm = createProductForm();
+router.post('/create', async (req, res) => {
+
+     const allCategories = await Category.fetchAll().map((category) => {
+        return [category.get('id'), category.get('name')]
+    });
+
+    const allTags = await Tag.fetchAll().map(tag => [tag.get('id'), tag.get('name')])
+
+    // inject in all the categories and all the tags
+    const productForm = createProductForm(allCategories, allTags);
+
+
     productForm.handle(req, {
         'success': async (form) => {
 
@@ -64,10 +74,13 @@ router.post('/create', (req, res) => {
                 await newProduct.tags().attach(tags.split(","))
             }
             // display a success message
+            // ... add to flash messages -- which is stored in the session
             req.flash('success_messages', 'New product has been created successfully');
             res.redirect('/products')
         },
         'error': (form) => {
+            
+            req.flash('error_messages', 'Please correct all errors and try again')
             res.render('products/create', {
                 'form': form.toHTML(bootstrapField)
             })
@@ -152,7 +165,7 @@ router.post("/:product_id/update", async (req, res) => {
             // smart but not as efficient
             productToEdit.tags().detach(existingTagsId);
             productToEdit.tags().attach(newTagsId);
-
+            req.flash('success_messages', "Product has been updated")
             res.redirect('/products')
         },
         'error': async (form) => {
@@ -186,6 +199,7 @@ router.post('/:product_id/delete', async (req, res) => {
 
     // delete the product
     await productToDelete.destroy();
+    req.flash('success_messages', 'Product has been deleted')
     res.redirect('/products');
 })
 

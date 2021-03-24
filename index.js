@@ -40,7 +40,7 @@ app.use(function(req,res,next){
     // inject into the hbs file the success messages and error messages
     res.locals.success_messages = req.flash('success_messages');
     res.locals.error_messages = req.flash('error_messages');
-
+    next();
 })
 
 // import in the routes
