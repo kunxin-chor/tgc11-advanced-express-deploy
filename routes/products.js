@@ -123,7 +123,7 @@ router.post("/:product_id/update", async (req, res) => {
     });
 
     const productJSON = productToEdit.toJSON();
-    const selectedTagIds = productJSON.tags.map(t => t.id);
+    const existingTagsId = productJSON.tags.map(t => t.id);
 
     const productForm = createProductForm();
 
@@ -136,16 +136,21 @@ router.post("/:product_id/update", async (req, res) => {
             // get the array of the new tag ids
             let newTagsId = tags.split(",")
 
-            // remove all the tags that don't belong to the product           
-            // i.e, find all the tags that WERE part of the product but not in the form            
-            let toRemove = selectedTagIds.filter( id => newTagsId.includes(id) === false);
-            await productToEdit.tags().detach(toRemove);
+            // ultra-complex solution
+            // // remove all the tags that don't belong to the product           
+            // // i.e, find all the tags that WERE part of the product but not in the form            
+            // let toRemove = existingTagsId.filter(id => 
+            //     newTagsId.includes(id) === false);
+            // await productToEdit.tags().detach(toRemove);
 
-            // add in all the tags selected in the form
-            // i.e select all the tags that are in the form but not added to the product yet
-            let toAdd = newTagsId.filter( id=> selectedTagIds.includes(id) === false);
-            await productToEdit.tags().attach(toAdd);
+            // // add in all the tags selected in the form
+            // // i.e select all the tags that are in the form but not added to the product yet
+            // let toAdd = newTagsId.filter(id => existingTagsId.includes(id) === false);
+            // await productToEdit.tags().attach(toAdd);
 
+            // smart but not as efficient
+            productToEdit.tags().detach(existingTagsId);
+            productToEdit.tags().attach(newTagsId);
 
             res.redirect('/products')
         },
