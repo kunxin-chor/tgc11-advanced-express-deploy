@@ -69,7 +69,7 @@ router.post('/login', async (req, res) => {
             let user = await User.where({
                 'email': form.data.email
             }).fetch({
-                require:false
+                require:true
             });
 
             // 2. if the user exists, check if the password

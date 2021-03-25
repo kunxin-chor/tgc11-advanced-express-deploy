@@ -31,7 +31,7 @@ router.get('/', async (req, res) => {
     })
 })
 
-router.get('/create', checkIfAuthenticated, async (req, res) => {
+router.get('/create', async (req, res) => {
     const allCategories = await Category.fetchAll().map((category) => {
         return [category.get('id'), category.get('name')]
     });
@@ -40,11 +40,14 @@ router.get('/create', checkIfAuthenticated, async (req, res) => {
 
     const productForm = createProductForm(allCategories, allTags);
     res.render('products/create', {
-        'form': productForm.toHTML(bootstrapField)
+        'form': productForm.toHTML(bootstrapField),
+        'cloudinaryName': process.env.CLOUDINARY_NAME,
+        'cloudinaryApiKey': process.env.CLOUDINARY_API_KEY,
+        'cloudinaryPreset': process.env.CLOUDINARY_UPLOAD_PRESET
     })
 });
 
-router.post('/create', checkIfAuthenticated, async (req, res) => {
+router.post('/create', async (req, res) => {
 
      const allCategories = await Category.fetchAll().map((category) => {
         return [category.get('id'), category.get('name')]
@@ -92,7 +95,7 @@ router.post('/create', checkIfAuthenticated, async (req, res) => {
     })
 })
 
-router.get('/:product_id/update', checkIfAuthenticated, async (req, res) => {
+router.get('/:product_id/update', async (req, res) => {
     // get all the possible categories
     const allCategories = await Category.fetchAll().map((category) => {
         return [category.get('id'), category.get('name')]
@@ -122,15 +125,19 @@ router.get('/:product_id/update', checkIfAuthenticated, async (req, res) => {
     // assign the current category_id to the form
     form.fields.category_id.value = productToEdit.get('category_id');
     form.fields.tags.value = selectedTagIds;
+    form.fields.image_url.value = productToEdit.get('image_url')
 
 
     res.render('products/update', {
         'form': form.toHTML(bootstrapField),
         'product': productJSON,
+        'cloudinaryName': process.env.CLOUDINARY_NAME,
+        'cloudinaryApiKey': process.env.CLOUDINARY_API_KEY,
+        'cloudinaryPreset': process.env.CLOUDINARY_UPLOAD_PRESET
     })
 })
 
-router.post("/:product_id/update", checkIfAuthenticated, async (req, res) => {
+router.post("/:product_id/update", async (req, res) => {
     // 1. get the product that we want to update
     // i.e, select * from products where id = ${product_id}
     const productToEdit = await Product.where({
