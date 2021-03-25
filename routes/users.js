@@ -6,7 +6,7 @@ const { createUserForm, createLoginForm, bootstrapField } = require('../forms')
 
 const { User } = require('../models');
 
-const getHashedPassword = (password) =>{
+const getHashedPassword = (password) => {
     const sha256 = crypto.createHash('sha256');
     const hash = sha256.update(password).digest('base64');
     return hash;
@@ -64,11 +64,13 @@ router.post('/login', async (req, res) => {
     const loginForm = createLoginForm();
     loginForm.handle(req, {
         'success': async (form) => {
-
+            
             // 1. find the user based on the email address
             let user = await User.where({
                 'email': form.data.email
-            }).fetch();
+            }).fetch({
+                require:false
+            });
 
             // 2. if the user exists, check if the password
             // matches
@@ -85,10 +87,14 @@ router.post('/login', async (req, res) => {
                     req.flash('success_messages', `Welcome back, ${req.session.user.username}`);
                     res.redirect('/products');
 
+                } else {
+                    console.log("password not found")
+                    req.flash('error_messages', 'Please double check your email and password');
+                    res.redirect('/users/login');
                 }
             } else {
-
-                // 3b. but if the password don't matches,
+                console.log("user not")
+                // 3b. the user is found
                 // redirect to the login page with an error message
                 req.flash('error_messages', 'Please double check your email and password');
                 res.redirect('/users/login');
@@ -102,19 +108,19 @@ router.post('/login', async (req, res) => {
     })
 })
 
-router.get('/profile', (req,res)=>{
+router.get('/profile', (req, res) => {
     if (!req.session.user) {
         // current user has not logged in
         req.flash('error_messages', 'Please login first');
         res.redirect('/users/login')
     } else {
-        res.render('users/profile',{
+        res.render('users/profile', {
             'user': req.session.user
         })
     }
 })
 
-router.get('/logout', (req,res)=>{
+router.get('/logout', (req, res) => {
     req.session.user = null;
     req.flash('success_messages', 'Bye bye');
     res.redirect('/users/login')
