@@ -9,26 +9,88 @@ const { Product, Category, Tag } = require('../models');
 // we use `models.Product`
 
 // import in the forms
-const { createProductForm, bootstrapField } = require('../forms')
+const { createProductForm, createProductSearchForm, bootstrapField } = require('../forms')
 
 // import in the checkIfAuthenticated middleware
-const {checkIfAuthenticated} = require('../middlewares')
+const { checkIfAuthenticated } = require('../middlewares')
 
 router.get('/', async (req, res) => {
-
-    // How we get the data previously using mysql2:
-    //const query = "SELECT * FROM products";
-    //const [products] = connection.execute(query)
-
-    let products = await Product.collection().fetch({
-        withRelated: ['category', 'tags']
+    const allCategories = await Category.fetchAll().map((category) => {
+        return [category.get('id'), category.get('name')]
     });
+    // manually add to the front of all categories an option of 0 (none selected)
+    allCategories.unshift([0, '-------'])
+
+    const allTags = await Tag.fetchAll().map(tag => [tag.get('id'), tag.get('name')]);
+
+    const searchForm = createProductSearchForm(allCategories, allTags);
+
+    // creating a base query (i.e, SELECT * FROM products)
+    // aka a query builder
+    let q = Product.collection();
+
+    searchForm.handle(req, {
+        'empty': async (form) => {
+            // if the form is empty, we display all the possible products
+            // fetch() will execute the query
+            let products = await q.fetch({
+                withRelated: ['category', 'tags']
+            });
+
+            res.render('products/index', {
+                'products': products.toJSON(),
+                'form': form.toHTML(bootstrapField)
+            })
+        },
+        'error': async (form) => {
+            // if the form is empty, we display all the possible products
+            // fetch() will execute the query
+            let products = await q.fetch({
+                withRelated: ['category', 'tags']
+            });
+
+            res.render('products/index', {
+                'products': products.toJSON(),
+                'form': form.toHTML(bootstrapField)
+            })
+        },
+        'success': async (form) => {
+            if (form.data.name) {
+                // adding a WHERE name LIKE '%<name>%'
+                q = q.where('name', 'like', '%' + form.data.name + '%')
+            }
+
+            if (form.data.category_id !== "0") {
+                q = q.where('category_id', '=', form.data.category_id)
+            }
+
+            if (form.data.min_cost) {
+                q = q.where('cost', '>=', form.data.min_cost)
+            }
+
+            if (form.data.max_cost) {
+                q = q.where('cost', '<=', form.data.max_cost)
+            }
+
+            if (form.data.tags) {
+                q = q.query('join', 'products_tags', 'products.id', 'product_id')
+                    .where('tag_id', 'in', form.data.tags.split(','))
+            }
+
+            let products = await q.fetch({
+                withRelated: ['category', 'tags']
+            });
 
 
 
-    res.render('products/index', {
-        'products': products.toJSON()
+            res.render('products/index', {
+                'products': products.toJSON(),
+                'form': form.toHTML(bootstrapField)
+            })
+        }
     })
+
+
 })
 
 router.get('/create', async (req, res) => {
@@ -49,7 +111,7 @@ router.get('/create', async (req, res) => {
 
 router.post('/create', async (req, res) => {
 
-     const allCategories = await Category.fetchAll().map((category) => {
+    const allCategories = await Category.fetchAll().map((category) => {
         return [category.get('id'), category.get('name')]
     });
 
@@ -86,7 +148,7 @@ router.post('/create', async (req, res) => {
             res.redirect('/products')
         },
         'error': (form) => {
-            
+
             req.flash('error_messages', 'Please correct all errors and try again')
             res.render('products/create', {
                 'form': form.toHTML(bootstrapField)

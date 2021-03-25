@@ -104,14 +104,14 @@ const createUserForm = () => {
             cssClasses: {
                 label: ['form-label']
             },
-            validators:[validators.matchField('password')]
+            validators: [validators.matchField('password')]
         })
     })
 }
 
-const createLoginForm = ()=>{
+const createLoginForm = () => {
     return forms.create({
-         'email': fields.string({
+        'email': fields.string({
             required: true,
             errorAfterField: true,
             cssClasses: {
@@ -129,4 +129,50 @@ const createLoginForm = ()=>{
     })
 }
 
-module.exports = { createProductForm, createUserForm, createLoginForm, bootstrapField }
+const createProductSearchForm = (categories, tags) => {
+    return forms.create({
+        'name': fields.string({
+            required: false,
+            errorAfterField: true,
+            cssClass: {
+                label: ['form-label']
+            }
+        }),
+        'min_cost': fields.string({
+            required: false,
+            errorAfterField: true,
+            cssClass: {
+                label: ['form-label']
+            },
+            validators: [validators.integer()]
+        }),
+        'max_cost': fields.string({
+            required: false,
+            errorAfterField: true,
+            cssClass: {
+                label: ['form-label']
+            },
+            validators: [validators.integer()]
+        }),
+        'category_id': fields.string({
+            label: 'Category',
+            required: false,
+            errorAfterField: true,
+            cssClasses: ['form-label'],
+            widget: widgets.select(),
+            choices: categories
+        }),
+        'tags': fields.string({
+            required: false,
+            errorAfterField: true,
+            cssClasses: {
+                label: ['form-label']
+            },
+            widget: widgets.multipleSelect(),
+            choices: tags
+        })
+    });
+}
+
+module.exports = { createProductForm, createUserForm,
+     createLoginForm, createProductSearchForm, bootstrapField }
