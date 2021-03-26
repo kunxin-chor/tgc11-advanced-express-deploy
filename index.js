@@ -28,7 +28,7 @@ app.use(
 
 // setup session
 app.use(session({
-    'secret': 'whatever',
+    'secret': process.env.SESSION_SECRET_KEY,
     'resave': false, // we will not resave the session if there are no changes
     'saveUninitialized': true // if a client conencts with no session, immediately create one
 }));
