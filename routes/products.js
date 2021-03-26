@@ -111,11 +111,11 @@ router.get('/create', async (req, res) => {
 
 router.post('/create', async (req, res) => {
 
-    const allCategories = await Category.fetchAll().map((category) => {
-        return [category.get('id'), category.get('name')]
-    });
+        const allCategories = await Category.fetchAll().map((category) => {
+            return [category.get('id'), category.get('name')]
+        });
 
-    const allTags = await Tag.fetchAll().map(tag => [tag.get('id'), tag.get('name')])
+        const allTags = await Tag.fetchAll().map(tag => [tag.get('id'), tag.get('name')])
 
     // inject in all the categories and all the tags
     const productForm = createProductForm(allCategories, allTags);
