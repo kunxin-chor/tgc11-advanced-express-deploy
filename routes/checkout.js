@@ -15,11 +15,35 @@ router.get('/checkout', async(req,res)=>{
 
     for (let cartItem of allCartItems) {
         const lineItem = {
-            'name' : cartItem.related('product').get('name')
+            'name' : cartItem.related('product').get('name'),
+            'amount': cartItem.related('product').get('cost'),
+            'quantity': cartItem.get('quantity'),
+            'currency': 'SGD'
         }
+        // check if the related product has an image
+        if (cartItem.related('product').get('image_url')) {
+            // if it does, add in to lineitem
+            lineItem.images = [cartItem.related('product').get('image_url')]
+        }
+        lineItems.push(lineItem);
+        // keep of track of for each product, what is quantity purchased
+        meta.push({
+            'product_id': cartItem.get('product_id'),
+            'quantity': cartItem.get('quantity')
+        })
     }
 
     // 2. using Stripe, create the payment
+    let metaData = JSON.stringify(meta); // why Stringify? because later when we set the meta data, it must be a string
+    const payment = {
+        payment_method_types:['card'],
+        line_items: lineItems,
+        success_url: process.env.STRIPE_SUCCESS_URL + '?sessionId={CHECKOUT_SESSION_ID}',
+        cancel_url: process.env.STRIPE_ERROR_URL,
+        metadata: {
+            'orders': metaData
+        }
+    }
 
     // 3. register the payment
 
