@@ -41,5 +41,4 @@ const updateQuantity = async(userId, productId, newQuantity) => {
 }
 
 module.exports = {
-    getCartItemByUserAndProduct, getAllItems, removeItem
-}
+    getCartItemByUserAndProduct, getAllItems, removeItem, updateQuantity}
