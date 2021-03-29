@@ -12,7 +12,7 @@ class CartServices{
         // and having a certain product id.
         const cartItem = await cartDataLayer
                         .getCartItemByUserAndProduct(this.user_id, productId)
-        res.send(cartItem);
+        console.log(cartItem);
         // if the item does not exist, create
         // and save to the cart
         if (!cartItem) {

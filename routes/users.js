@@ -90,7 +90,7 @@ router.post('/login', async (req, res) => {
                 } else {
                     console.log("password not found")
                     req.flash('error_messages', 'Please double check your email and password');
-                    res.redirect('/users/login');
+                    res.redirect('/users/login');cl
                 }
             } else {
                 console.log("user not")
