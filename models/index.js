@@ -37,6 +37,10 @@ const User = bookshelf.model('User',{
     tableName:'users'
 })
 
+const CartItem = bookshelf.model('CartItem',{
+    tableName: 'cart_items'
+})
+
 module.exports = {
-    Product, Category, Tag, User
+    Product, Category, Tag, User, CartItem
 }
