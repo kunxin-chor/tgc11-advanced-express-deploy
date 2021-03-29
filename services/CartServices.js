@@ -6,13 +6,17 @@ class CartServices{
         this.user_id = user_id;
     }
 
+    async getAll() {
+        const allItems = await cartDataLayer.getAllItems(this.user_id);
+        return allItems;
+    }
+
     async addToCart(productId) {
         // check if the cart item already exists in the cart
         // i.e we are getting a cart item belonging to the user
         // and having a certain product id.
         const cartItem = await cartDataLayer
                         .getCartItemByUserAndProduct(this.user_id, productId)
-        console.log(cartItem);
         // if the item does not exist, create
         // and save to the cart
         if (!cartItem) {
@@ -30,8 +34,18 @@ class CartServices{
             await cartItem.save();
             return cartItem;
         }
+    }
 
+    async removeItem(productId) {
+        return await cartDataLayer.removeItem(this.user_id, productId);
+    }
 
+    async updateQuantity(productId, newQuantity) {
+        return await cartDataLayer.updateQuantity(
+            this.user_id,
+            productId,
+            newQuantity
+        )
     }
 }
 

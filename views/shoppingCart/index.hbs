@@ -1,0 +1,27 @@
+{{#extends 'base'}}
+
+{{#block 'content'}}
+<h1>Your shopping cart</h1>
+<ul class="list-group">
+
+    {{#each this.allItems}}
+    <li class="list-group-item">
+        <h4>{{this.product.name}}</h4>
+        <h5>Price: {{this.product.cost}}</h5>
+        <form method="POST" action="/shoppingCart/{{this.product.id}}/quantity/update">
+        <input type="hidden" name="_csrf" value="{{../csrfToken}}"/>
+        <h5>
+            Quantity: <input type="text" style="width:30px" name="quantity" value="{{this.quantity}}">
+            <input type="submit" class="btn btn-success btn-sm" value="Update Quantity"/>
+        </h5>
+        </form>   
+        <a href="/shoppingCart/{{this.product.id}}/remove" class="btn btn-danger btn-sm">Remove</a> 
+    </li>
+    
+    {{/each}}
+
+</ul>
+
+{{/block}}
+
+{{/extends}}
