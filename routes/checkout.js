@@ -46,8 +46,14 @@ router.get('/checkout', async(req,res)=>{
     }
 
     // 3. register the payment
+    let stripeSession = await stripe.checkout.sessions.create(payment);
+ 
 
     // 4. send the payment session ID to a hbs file and use JavaScript to redirect
+       res.render('checkout/checkout', {
+        'sessionId': stripeSession.id,
+        'publishableKey': process.env.STRIPE_PUBLISHABLE_KEY
+    })
 })
 
 module.exports = router;
