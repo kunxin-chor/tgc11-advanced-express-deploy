@@ -4,18 +4,18 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 const CartServices = require('../services/CartServices')
 
-router.get('/checkout', async(req,res)=>{
+router.get('/checkout', async (req, res) => {
 
     // 1. create line items -- tell Stripe what the customer is paying for
     const cartService = new CartServices(req.session.user.id);
-    let allCartItems = cartService.getAll();
+    let allCartItems = await cartService.getAll();
 
     let lineItems = [];
     let meta = [];
 
     for (let cartItem of allCartItems) {
         const lineItem = {
-            'name' : cartItem.related('product').get('name'),
+            'name': cartItem.related('product').get('name'),
             'amount': cartItem.related('product').get('cost'),
             'quantity': cartItem.get('quantity'),
             'currency': 'SGD'
@@ -36,7 +36,7 @@ router.get('/checkout', async(req,res)=>{
     // 2. using Stripe, create the payment
     let metaData = JSON.stringify(meta); // why Stringify? because later when we set the meta data, it must be a string
     const payment = {
-        payment_method_types:['card'],
+        payment_method_types: ['card'],
         line_items: lineItems,
         success_url: process.env.STRIPE_SUCCESS_URL + '?sessionId={CHECKOUT_SESSION_ID}',
         cancel_url: process.env.STRIPE_ERROR_URL,
@@ -47,10 +47,10 @@ router.get('/checkout', async(req,res)=>{
 
     // 3. register the payment
     let stripeSession = await stripe.checkout.sessions.create(payment);
- 
+
 
     // 4. send the payment session ID to a hbs file and use JavaScript to redirect
-       res.render('checkout/checkout', {
+    res.render('checkout/checkout', {
         'sessionId': stripeSession.id,
         'publishableKey': process.env.STRIPE_PUBLISHABLE_KEY
     })

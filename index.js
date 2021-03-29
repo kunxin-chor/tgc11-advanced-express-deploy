@@ -82,6 +82,7 @@ const productRoutes = require('./routes/products')
 const userRoutes = require('./routes/users')
 const cloudinaryRoutes = require('./routes/cloudinary');
 const shoppingCartRoutes = require('./routes/shoppingCart');
+const checkoutRoutes = require('./routes/checkout')
 
 async function main() {
   // if the URL begins exactly with a forward slash
@@ -92,6 +93,7 @@ async function main() {
   app.use('/users', userRoutes);
   app.use('/cloudinary', cloudinaryRoutes);
   app.use('/shoppingCart', shoppingCartRoutes);
+  app.use('/checkout', checkoutRoutes)
 }
 
 main();
