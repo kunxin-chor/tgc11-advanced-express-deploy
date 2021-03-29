@@ -3,8 +3,10 @@ const hbs = require("hbs");
 const wax = require("wax-on");
 require("dotenv").config();
 const session = require('express-session');
+const FileStore = require('session-file-store')(session);
 const flash = require('connect-flash');
 const csurf = require('csurf')
+
 
 // create an instance of express app
 let app = express();
@@ -77,7 +79,8 @@ const landingRoutes = require('./routes/landing');
 const corporateRoutes = require('./routes/corporate');
 const productRoutes = require('./routes/products')
 const userRoutes = require('./routes/users')
-const cloudinaryRoutes = require('./routes/cloudinary')
+const cloudinaryRoutes = require('./routes/cloudinary');
+const shoppingCartRoutes = require('./routes/shoppingCart');
 
 async function main() {
   // if the URL begins exactly with a forward slash
@@ -87,6 +90,7 @@ async function main() {
   app.use('/products', productRoutes);
   app.use('/users', userRoutes);
   app.use('/cloudinary', cloudinaryRoutes);
+  app.use('/shoppingCart', shoppingCartRoutes);
 }
 
 main();
