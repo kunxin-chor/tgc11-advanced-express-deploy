@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const bodyParser = require('body-parser');
 
 const CartServices = require('../services/CartServices')
 
@@ -54,6 +55,25 @@ router.get('/checkout', async (req, res) => {
         'sessionId': stripeSession.id,
         'publishableKey': process.env.STRIPE_PUBLISHABLE_KEY
     })
+})
+
+router.post('/process_payment', bodyParser.raw({type:'application/json'}), async (req,res)=>{
+    let payload = req.body;
+    let endpointSecret = process.env.STRIPE_ENDPOINT_SECRET;
+    let sigHeader = req.headers['stripe-signature'];
+    let event;
+    try {
+        event = stripe.webhooks.constructEvent(payload, sigHeader, endpointSecret);
+    } catch (e) {
+        res.send({
+            'error': e.message
+        });
+        console.log(e.message)
+    }
+    if (event.type == 'checkout.session.completed') {
+        console.log(event.data.object);
+    }
+    res.sendStatus(200);
 })
 
 module.exports = router;

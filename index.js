@@ -43,7 +43,17 @@ app.use(session({
 app.use(flash());
 
 // setup CSURF
-app.use(csurf());
+// app.use(csurf());
+const csurfInstance = csurf();
+app.use(function (req, res, next) {
+  // exclude /checkout/process_payment for CSRF
+  console.log(req.url);
+  if (req.url === '/checkout/process_payment') {
+      return next()
+  }
+  csurfInstance(req, res, next)
+})
+
 app.use(function (err, req, res, next) {
      if (err && err.code == "EBADCSRFTOKEN") {
          req.flash('error_messages', 'The form has expired. Please try again');
@@ -71,7 +81,10 @@ app.use(function(req,res,next){
 })
 
 app.use(function(req,res,next){
-    res.locals.csrfToken = req.csrfToken();
+    if (req.csrfToken) {
+        res.locals.csrfToken = req.csrfToken();
+    }
+    
     next();
 })
 
