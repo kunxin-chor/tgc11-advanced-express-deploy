@@ -47,8 +47,8 @@ app.use(flash());
 const csurfInstance = csurf();
 app.use(function (req, res, next) {
   // exclude /checkout/process_payment for CSRF
-  console.log(req.url);
-  if (req.url === '/checkout/process_payment') {
+  if (req.url === '/checkout/process_payment' || 
+      req.url.slice(0,5) == '/api/') {
       return next()
   }
   csurfInstance(req, res, next)
@@ -97,6 +97,11 @@ const cloudinaryRoutes = require('./routes/cloudinary');
 const shoppingCartRoutes = require('./routes/shoppingCart');
 const checkoutRoutes = require('./routes/checkout')
 
+// API routes
+const api = {
+    'products': require('./routes/api/products')
+}
+
 async function main() {
   // if the URL begins exactly with a forward slash
   // use the landingRoutes
@@ -107,6 +112,7 @@ async function main() {
   app.use('/cloudinary', cloudinaryRoutes);
   app.use('/shoppingCart', shoppingCartRoutes);
   app.use('/checkout', checkoutRoutes)
+  app.use('/api/products', express.json(), api.products);
 }
 
 main();
